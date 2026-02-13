@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Weather Forecast - Region Color Coding</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .wrapper {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #1f2937;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #334155;
+    }
+
+    .dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      border-radius: 12px;
+      color: white;
+      padding: 14px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+    }
+
+    .region {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .temp {
+      font-size: 16px;
+      opacity: 0.95;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrapper">
+    <h1>Weather Forecast (Color-Coded Regions)</h1>
+
+    <div class="legend">
+      <div class="legend-item"><span class="dot" style="background:#1E88E5"></span> ≤ 10°C (Blue)</div>
+      <div class="legend-item"><span class="dot" style="background:#43A047"></span> 11–20°C (Green)</div>
+      <div class="legend-item"><span class="dot" style="background:#FB8C00"></span> 21–30°C (Orange)</div>
+      <div class="legend-item"><span class="dot" style="background:#E53935"></span> > 30°C (Red)</div>
+    </div>
+
+    <div id="regionGrid" class="grid"></div>
+  </div>
+
+  <script>
+    function renderRegions(regions) {
+      const regionGrid = document.getElementById('regionGrid');
+      regionGrid.innerHTML = '';
+
+      regions.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.background = item.colorCode;
+        card.innerHTML = `
+          <div class="region">${item.region}</div>
+          <div class="temp">Temperature: ${item.temperatureC}°C</div>
+        `;
+        regionGrid.appendChild(card);
+      });
+    }
+
+    async function loadRegions() {
+      const response = await fetch('/api/regions');
+      const regions = await response.json();
+      renderRegions(regions);
+    }
+
+    loadRegions().catch(error => {
+      const fallback = [
+        { region: 'New Delhi', temperatureC: 8, colorCode: '#1E88E5' },
+        { region: 'Mumbai', temperatureC: 32, colorCode: '#E53935' },
+        { region: 'Bengaluru', temperatureC: 22, colorCode: '#FB8C00' }
+      ];
+      renderRegions(fallback);
+      console.error(error);
+    });
+  </script>
+</body>
+</html>
